@@ -1,4 +1,4 @@
-﻿using System;
+﻿using static System.Console;
 
 namespace Bin2Reg
 {
@@ -9,34 +9,19 @@ namespace Bin2Reg
     {
         public static int Main(string[] args)
         {
-            ArgumentsChecker argumentsChecker = new ArgumentsChecker(args);
+            ArgumentsChecker checker = new ArgumentsChecker(args);
 
-            if (!argumentsChecker.Run())
+            if (!checker.Run())
             {
-                Console.WriteLine(argumentsChecker.Error);
+                WriteLine(checker.Error);
 
                 return -1;
             }
 
-            Action action = argumentsChecker.Action;
-            string registryKey = argumentsChecker.Key;
-            string filePath = argumentsChecker.FilePath;
-
-            //var encoder = new XorEncoder();
-            IEncoder encoder = new Dpapi();
-            ConversionManager conversion = new ConversionManager(new FileHandler(), new RegistryHandler(), encoder);
-
-            conversion.Run(action, registryKey, filePath);
-
-            Console.WriteLine(conversion.Result);
+            using (ConversionManager manager = new ConversionManager(new FileHandler(), new RegistryHandler(), new Dpapi()))
+                WriteLine(manager.Run(checker.Action, checker.Key, checker.FilePath));
 
             return 0;
         }
-    }
-
-    public enum Action
-    {
-        Store,
-        Restore
     }
 }

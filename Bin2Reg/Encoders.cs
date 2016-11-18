@@ -11,7 +11,7 @@ namespace Bin2Reg.Encoders
         byte[] Decode(byte[] cipher);
     }
 
-    public class Dpapi
+    public sealed class Dpapi
         : IEncoder
     {
         public DataProtectionScope ProtectionScope { get; set; }
@@ -31,11 +31,11 @@ namespace Bin2Reg.Encoders
 
         public byte[] Decode(byte[] cipher) => Encryption(ProtectedData.Unprotect, cipher);
 
-        private byte[] Encryption(Func<byte[], byte[], DataProtectionScope, byte[]> transform, byte[] data) => transform(data, null, ProtectionScope);
+        internal byte[] Encryption(Func<byte[], byte[], DataProtectionScope, byte[]> transform, byte[] data) => transform(data, null, ProtectionScope);
     }
 
     [Obsolete("Use 'Bin2Reg::Encoders::Dpapi' instead.", error:true)]
-    public class XorEncoder
+    public sealed class XorEncoder
         : IEncoder
     {
         // Order alphabetically

@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections;
+﻿using System.Collections;
 using Microsoft.Win32;
-using System.Text;
-using System.Linq;
 using System.IO;
-using System;
 
 namespace Bin2Reg.ResourceHandlers
 {
