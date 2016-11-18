@@ -1,0 +1,5 @@
+L:\Projects.VisualStudio\Bin2Reg\Bin2Reg\bin\Debug\Bin2Reg.exe
+L:\Projects.VisualStudio\Bin2Reg\Bin2Reg\bin\Debug\Bin2Reg.pdb
+L:\Projects.VisualStudio\Bin2Reg\Bin2Reg\obj\x86\Debug\Bin2Reg.csprojResolveAssemblyReference.cache
+L:\Projects.VisualStudio\Bin2Reg\Bin2Reg\obj\x86\Debug\Bin2Reg.exe
+L:\Projects.VisualStudio\Bin2Reg\Bin2Reg\obj\x86\Debug\Bin2Reg.pdb

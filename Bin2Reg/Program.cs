@@ -1,36 +1,42 @@
 ﻿using System;
-using Bin2Reg.Encoders;
-using Bin2Reg.ResourceHandlers;
 
-namespace Bin2Reg {
+namespace Bin2Reg
+{
+    using ResourceHandlers;
+    using Encoders;
 
-    enum Action {
-        Store,
-        Restore
-    }
+    public static class Program
+    {
+        public static int Main(string[] args)
+        {
+            ArgumentsChecker argumentsChecker = new ArgumentsChecker(args);
 
-    class Program {
-        static void Main(string[] args) {
-            var argumentsChecker = new ArgumentsChecker(args);
-
-            if (!argumentsChecker.Run()) {
+            if (!argumentsChecker.Run())
+            {
                 Console.WriteLine(argumentsChecker.Error);
-                return;
+
+                return -1;
             }
 
-            var action = argumentsChecker.Action;
-            var registryKey = argumentsChecker.Key;
-            var filePath = argumentsChecker.FilePath;
+            Action action = argumentsChecker.Action;
+            string registryKey = argumentsChecker.Key;
+            string filePath = argumentsChecker.FilePath;
 
-            var fileHandler = new FileHandler();
-            var registryHandler = new RegistryHandler();
             //var encoder = new XorEncoder();
-            var encoder = new Dpapi();
+            IEncoder encoder = new Dpapi();
+            ConversionManager conversion = new ConversionManager(new FileHandler(), new RegistryHandler(), encoder);
 
-            var conversion = new ConversionManager(fileHandler, registryHandler, encoder);
             conversion.Run(action, registryKey, filePath);
 
             Console.WriteLine(conversion.Result);
+
+            return 0;
         }
+    }
+
+    public enum Action
+    {
+        Store,
+        Restore
     }
 }

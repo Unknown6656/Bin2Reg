@@ -1,73 +1,83 @@
-using System;
 using System.IO;
-using Bin2Reg.Interfaces;
+using System;
 
-namespace Bin2Reg {
-    internal class ConversionManager {
+namespace Bin2Reg
+{
+    using ResourceHandlers;
+    using Encoders;
+
+    internal class ConversionManager
+    {
         private readonly IResourceHandler _fileHandler;
         private readonly IResourceHandler _registryHandler;
         private readonly IEncoder _encoder;
 
-        public ConversionManager(IResourceHandler fileHandler, IResourceHandler registryHandler, IEncoder encoder) {
+        public string Result { get; set; }
+
+
+        public ConversionManager(IResourceHandler fileHandler, IResourceHandler registryHandler, IEncoder encoder)
+        {
             _fileHandler = fileHandler;
             _registryHandler = registryHandler;
             _encoder = encoder;
         }
 
-        public string Result { get; set; }
-
-        internal void Run(Action action, string registryKey, string filePath) {
-            switch (action) {
+        internal void Run(Action action, string registryKey, string filePath)
+        {
+            switch (action)
+            {
                 case Action.Store:
                     StoreFileInRegistry(filePath, registryKey);
+
                     break;
                 case Action.Restore:
                     RestoreFileFromRegistry(filePath, registryKey);
+
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("action");
+                    throw new ArgumentOutOfRangeException(nameof(action));
             }
         }
 
-        private void StoreFileInRegistry(string filePath, string registryKey) {
-            var file = _fileHandler.GetFile(filePath);
-            if (file == null) {
-                Result = "Error: Could not find the file.";
+        private void StoreFileInRegistry(string path, string regkey)
+        {
+            byte[] data = _fileHandler.GetFile(path);
+
+            if (data == null)
+            {
+                Result = "Error: Could not find the specified file.";
+
                 return;
             }
 
-            file = _encoder.Encode(file);
-
-            var storedFile = _registryHandler.SaveFile(file, registryKey);
-            if (storedFile) {
-                Result = String.Format("The file {0} has been stored successfully.", Path.GetFileName(filePath));
-            }
-            else {
-                Result = "Error: Could not save the file.";
-            }
+            data = _encoder.Encode(data);
+            Result = (_registryHandler.SaveFile(data, regkey))
+                   ? $"The file {Path.GetFileName(path)} has been stored successfully."
+                   : "Error: Could not save the specified file.";
         }
 
-        private void RestoreFileFromRegistry(string filePath, string registryKey) {
-            if (File.Exists(filePath)) {
+        private void RestoreFileFromRegistry(string path, string regkey)
+        {
+            if (File.Exists(path))
+            {
                 Result = "Error: The file already exists.";
+
                 return;
             }
 
-            var file = _registryHandler.GetFile(registryKey);
-            if (file == null) {
+            byte[] data = _registryHandler.GetFile(regkey);
+
+            if (data == null)
+            {
                 Result = "Error: Could not find the value in the registry.";
+
                 return;
             }
 
-            file = _encoder.Decode(file);
-
-            var restoredFile = _fileHandler.SaveFile(file, filePath);
-            if (restoredFile) {
-                Result = String.Format("The file {0} has been restored successfully.", Path.GetFileName(filePath));
-            }
-            else {
-                Result = "Error: Could not restore the file.";
-            }
+            data = _encoder.Decode(data);
+            Result = (_fileHandler.SaveFile(data, path))
+                   ? $"The file {Path.GetFileName(path)} has been restored successfully."
+                   : "Error: Could not restore the file.";
         }
     }
 }
